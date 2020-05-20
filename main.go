@@ -4,6 +4,13 @@ import (
 	"github.com/gofiber/fiber"
 )
 
+type Pagination struct {
+	CurrentPage uint16
+	TotalPages  uint16
+	NextPage    uint16
+	PrevPage    uint16
+}
+
 type Car struct {
 	Name   string
 	Year   uint16
@@ -14,6 +21,11 @@ type Engine struct {
 	Cilinders uint8
 	Power     float32
 	GasType   string
+}
+
+type ResponseData struct {
+	Pagination Pagination
+	Cars       []Car
 }
 
 func main() {
@@ -39,35 +51,52 @@ func main() {
 		},
 	}
 
-	var Cars = []Car{car1, car2}
+	pagination1 := Pagination{
+		CurrentPage: 1,
+		TotalPages:  1,
+		NextPage:    0,
+		PrevPage:    0,
+	}
 
-	app.Get("/car", func(c *fiber.Ctx) {
-		data := Cars
-		c.JSON(data)
+	app.Get("/cars", func(c *fiber.Ctx) {
+		c.JSON(
+			ResponseData{
+				pagination1,
+				[]Car{car1, car2},
+			},
+		)
 	})
 
 	app.Listen(3000)
 }
 
 /*
-[
-    {
-        "Name": "Jeep",
-        "Year": 1951,
-        "Engine": {
-            "Cilinders": 6,
-            "Power": 3,
-            "GasType": "Diesel"
-        }
+{
+    "Pagination": {
+        "CurrentPage": 1,
+        "TotalPages": 1,
+        "NextPage": 0,
+        "PrevPage": 0
     },
-    {
-        "Name": "Dodge",
-        "Year": 1975,
-        "Engine": {
-            "Cilinders": 8,
-            "Power": 3.2,
-            "GasType": "Gas"
+    "Cars": [
+        {
+            "Name": "Jeep",
+            "Year": 1951,
+            "Engine": {
+                "Cilinders": 6,
+                "Power": 3,
+                "GasType": "Diesel"
+            }
+        },
+        {
+            "Name": "Dodge",
+            "Year": 1975,
+            "Engine": {
+                "Cilinders": 8,
+                "Power": 3.2,
+                "GasType": "Gas"
+            }
         }
-    }
-]
+    ]
+}
 */
